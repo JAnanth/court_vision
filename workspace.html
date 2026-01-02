@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace - CourtVision</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            backdrop-filter: blur(20px);
+            padding: 1.2rem 5%;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            color: #0d9488;
+            text-transform: uppercase;
+            font-family: 'Rajdhani', sans-serif;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+            letter-spacing: 0.3px;
+        }
+
+        .nav-links a:hover {
+            color: #0d9488;
+        }
+
+        /* Main Content */
+        .workspace {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 0 5%;
+        }
+
+        .page-header {
+            margin-bottom: 3rem;
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            color: #64748b;
+        }
+
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: white;
+            border-radius: 8px;
+            padding: 3rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0d9488;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: -0.3px;
+            text-transform: uppercase;
+        }
+
+        .upload-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 4rem 2rem;
+            text-align: center;
+            background: #f8fafc;
+            transition: all 0.3s;
+            cursor: pointer;
+            margin-bottom: 2rem;
+        }
+
+        .upload-zone:hover {
+            border-color: #0d9488;
+            background: #f0fdfa;
+        }
+
+        .upload-zone.active {
+            border-color: #0d9488;
+            background: #ccfbf1;
+        }
+
+        .upload-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            color: #0d9488;
+        }
+
+        .upload-zone h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .upload-zone p {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-button {
+            background: #0d9488;
+            color: white;
+            padding: 0.9rem 2rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .upload-button:hover {
+            background: #0f766e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+        }
+
+        .file-info {
+            display: none;
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .file-info.active {
+            display: block;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #0d9488;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-size {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .video-preview {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .video-preview.active {
+            display: block;
+        }
+
+        .video-preview video {
+            width: 100%;
+            border-radius: 6px;
+            background: #000;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Quick Settings Panel */
+        .settings-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            border: 1px solid #e2e8f0;
+            height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .setting-group {
+            margin-bottom: 2rem;
+        }
+
+        .setting-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .setting-label {
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 0.75rem;
+            display: block;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+        }
+
+        .toggle-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toggle-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toggle-option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #0d9488;
+        }
+
+        .toggle-option label {
+            color: #64748b;
+            cursor: pointer;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 1rem;
+            color: #0f172a;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #0d9488;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+        }
+
+        .analyze-button {
+            width: 100%;
+            background: #0d9488;
+            color: white;
+            padding: 1rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .analyze-button:hover:not(:disabled) {
+            background: #0f766e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+        }
+
+        .analyze-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Advanced Settings */
+        .advanced-section {
+            background: white;
+            border-radius: 8px;
+            padding: 3rem;
+            border: 1px solid #e2e8f0;
+            grid-column: 1 / -1;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .advanced-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .advanced-card {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .advanced-card h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 1rem;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: -0.3px;
+        }
+
+        .advanced-card p {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-badge {
+            display: inline-block;
+            background: #ccfbf1;
+            color: #0f766e;
+            padding: 0.3rem 0.85rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+            border: 1px solid #99f6e4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .slider-container {
+            margin-top: 1rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #0d9488;
+        }
+
+        .slider-value {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-weight: 600;
+            color: #0d9488;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <a href="index.html" class="logo">COURTVISION</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="workspace.html">Workspace</a>
+                <a href="analysis.html">View Analysis</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="workspace">
+        <div class="page-header">
+            <h1>Upload & Analyze</h1>
+            <p>Upload your basketball footage and customize your analysis pipeline</p>
+        </div>
+
+        <div class="workspace-grid">
+            <div class="upload-section">
+                <div class="section-title">
+                    VIDEO UPLOAD
+                </div>
+                
+                <div class="upload-zone" id="uploadZone">
+                    <div class="upload-icon">▲</div>
+                    <h3>Drop your video here</h3>
+                    <p>or click to browse files</p>
+                    <button class="upload-button">Select Video File</button>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;">Supported: MP4, MOV, AVI (Max 500MB)</p>
+                </div>
+
+                <div class="file-info" id="fileInfo">
+                    <div class="file-name">■ practice_session_jan2.mp4</div>
+                    <div class="file-size">Duration: 12:34 • Size: 145 MB</div>
+                </div>
+
+                <div class="video-preview" id="videoPreview">
+                    <video controls>
+                        <source src="" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+
+            <div class="settings-panel">
+                <div class="section-title">QUICK SETTINGS</div>
+                
+                <div class="setting-group">
+                    <label class="setting-label">Analysis Type</label>
+                    <select>
+                        <option>Full Analysis (Shots + Form + Movement)</option>
+                        <option>Shot Analysis Only</option>
+                        <option>Form Analysis Only</option>
+                        <option>Player Tracking</option>
+                    </select>
+                </div>
+
+                <div class="setting-group">
+                    <label class="setting-label">Court Detection</label>
+                    <select>
+                        <option>Auto-detect court boundaries</option>
+                        <option>Manual court marking</option>
+                        <option>Use preset court dimensions</option>
+                    </select>
+                </div>
+
+                <div class="setting-group">
+                    <label class="setting-label">Features to Extract</label>
+                    <div class="toggle-group">
+                        <div class="toggle-option">
+                            <input type="checkbox" id="shotChart" checked>
+                            <label for="shotChart">Shot Chart</label>
+                        </div>
+                        <div class="toggle-option">
+                            <input type="checkbox" id="makeRate" checked>
+                            <label for="makeRate">Make/Miss Rates</label>
+                        </div>
+                        <div class="toggle-option">
+                            <input type="checkbox" id="formAnalysis" checked>
+                            <label for="formAnalysis">Shooting Form</label>
+                        </div>
+                        <div class="toggle-option">
+                            <input type="checkbox" id="movement">
+                            <label for="movement">Movement Patterns</label>
+                        </div>
+                        <div class="toggle-option">
+                            <input type="checkbox" id="heatmap">
+                            <label for="heatmap">Heat Maps</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="analyze-button" id="analyzeBtn" disabled>
+                    Start Analysis
+                </button>
+            </div>
+        </div>
+
+        <div class="advanced-section">
+            <div class="section-title">ADVANCED PIPELINE CONFIGURATION</div>
+            <p style="color: #64748b; margin-bottom: 2rem;">Fine-tune the computer vision models and analysis parameters</p>
+            
+            <div class="advanced-grid">
+                <div class="advanced-card">
+                    <h4>▲ Shot Detection Model</h4>
+                    <p>Choose the ML model for detecting shooting attempts</p>
+                    <select>
+                        <option>YOLOv8 (Fast, Recommended)</option>
+                        <option>MediaPipe Pose (Accurate)</option>
+                        <option>Custom Trained Model</option>
+                    </select>
+                    <span class="info-badge">Accuracy: 94%</span>
+                </div>
+
+                <div class="advanced-card">
+                    <h4>● Player Tracking</h4>
+                    <p>Configure how players are detected and tracked</p>
+                    <select>
+                        <option>Single Player Focus</option>
+                        <option>Multi-Player Tracking</option>
+                        <option>Team Analysis (5v5)</option>
+                    </select>
+                    <span class="info-badge">Real-time</span>
+                </div>
+
+                <div class="advanced-card">
+                    <h4>◆ Court Calibration</h4>
+                    <p>Accuracy of court boundary detection</p>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="7" id="calibrationSlider">
+                        <div class="slider-value">Sensitivity: <span id="calibrationValue">7</span>/10</div>
+                    </div>
+                </div>
+
+                <div class="advanced-card">
+                    <h4>■ Frame Processing</h4>
+                    <p>Balance between speed and accuracy</p>
+                    <select>
+                        <option>Process Every Frame (Slow, Precise)</option>
+                        <option>Every 2 Frames (Balanced)</option>
+                        <option>Every 5 Frames (Fast)</option>
+                    </select>
+                    <span class="info-badge">~3 min processing</span>
+                </div>
+
+                <div class="advanced-card">
+                    <h4>◉ Ball Tracking Confidence</h4>
+                    <p>Minimum confidence for ball detection</p>
+                    <div class="slider-container">
+                        <input type="range" min="50" max="95" value="75" id="confidenceSlider">
+                        <div class="slider-value">Threshold: <span id="confidenceValue">75</span>%</div>
+                    </div>
+                </div>
+
+                <div class="advanced-card">
+                    <h4>▶ Output Format</h4>
+                    <p>Choose how to export analysis results</p>
+                    <div class="toggle-group" style="margin-top: 1rem;">
+                        <div class="toggle-option">
+                            <input type="checkbox" id="json" checked>
+                            <label for="json">JSON Data</label>
+                        </div>
+                        <div class="toggle-option">
+                            <input type="checkbox" id="csv" checked>
+                            <label for="csv">CSV Export</label>
+                        </div>
+                        <div class="toggle-option">
+                            <input type="checkbox" id="video">
+                            <label for="video">Annotated Video</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Upload zone interactivity
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInfo = document.getElementById('fileInfo');
+        const videoPreview = document.getElementById('videoPreview');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+
+        uploadZone.addEventListener('click', () => {
+            // Simulate file upload
+            uploadZone.classList.add('active');
+            setTimeout(() => {
+                fileInfo.classList.add('active');
+                videoPreview.classList.add('active');
+                analyzeBtn.disabled = false;
+                uploadZone.classList.remove('active');
+            }, 500);
+        });
+
+        // Drag and drop
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('active');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('active');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('active');
+            fileInfo.classList.add('active');
+            videoPreview.classList.add('active');
+            analyzeBtn.disabled = false;
+        });
+
+        // Slider updates
+        document.getElementById('calibrationSlider').addEventListener('input', (e) => {
+            document.getElementById('calibrationValue').textContent = e.target.value;
+        });
+
+        document.getElementById('confidenceSlider').addEventListener('input', (e) => {
+            document.getElementById('confidenceValue').textContent = e.target.value;
+        });
+
+        // Analyze button
+        analyzeBtn.addEventListener('click', () => {
+            window.location.href = 'analysis.html';
+        });
+    </script>
+</body>
+</html>
