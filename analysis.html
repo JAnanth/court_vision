@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - CourtVision</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            backdrop-filter: blur(20px);
+            padding: 1.2rem 5%;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            color: #0d9488;
+            text-transform: uppercase;
+            font-family: 'Rajdhani', sans-serif;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+            letter-spacing: 0.3px;
+        }
+
+        .nav-links a:hover {
+            color: #0d9488;
+        }
+
+        /* Main Content */
+        .analysis-container {
+            max-width: 1600px;
+            margin: 2rem auto;
+            padding: 0 5%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #0f172a;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        .video-info {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .export-button {
+            background: #0d9488;
+            color: white;
+            padding: 0.75rem 1.8rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.85rem;
+        }
+
+        .export-button:hover {
+            background: #0f766e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+        }
+
+        /* Stats Overview */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.8rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #0d9488;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #0f172a;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: -1px;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            color: #10b981;
+            margin-top: 0.25rem;
+            font-weight: 600;
+        }
+
+        .stat-change.negative {
+            color: #ef4444;
+        }
+
+        /* Main Analysis Grid */
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Shot Chart */
+        .shot-chart-section {
+            background: white;
+            border-radius: 8px;
+            padding: 2.5rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-header {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #0d9488;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: -0.3px;
+            text-transform: uppercase;
+        }
+
+        .chart-container {
+            position: relative;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 8px;
+            padding: 2.5rem;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .court {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 1;
+            background: #0a0e27;
+            border-radius: 6px;
+            border: 2px solid #334155;
+        }
+
+        .shot-marker {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .shot-marker:hover {
+            transform: translate(-50%, -50%) scale(1.4);
+        }
+
+        .shot-marker.make {
+            background: #10b981;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+        }
+
+        .shot-marker.miss {
+            background: #ef4444;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+        }
+
+        .legend {
+            display: flex;
+            gap: 2.5rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.make {
+            background: #10b981;
+        }
+
+        .legend-dot.miss {
+            background: #ef4444;
+        }
+
+        /* Zone Analysis */
+        .zone-analysis {
+            background: white;
+            border-radius: 8px;
+            padding: 2.5rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .zone-item {
+            padding: 1.2rem;
+            background: #f8fafc;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .zone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.6rem;
+        }
+
+        .zone-name {
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 0.95rem;
+        }
+
+        .zone-percentage {
+            font-weight: 900;
+            font-size: 1.2rem;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .zone-percentage.good {
+            color: #10b981;
+        }
+
+        .zone-percentage.average {
+            color: #f59e0b;
+        }
+
+        .zone-percentage.poor {
+            color: #ef4444;
+        }
+
+        .zone-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .zone-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .zone-attempts {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 0.3rem;
+            font-weight: 600;
+        }
+
+        /* Insights Section */
+        .insights-section {
+            grid-column: 1 / -1;
+            background: white;
+            border-radius: 8px;
+            padding: 2.5rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .insight-card {
+            background: #fef3c7;
+            padding: 1.8rem;
+            border-radius: 6px;
+            border-left: 4px solid #eab308;
+        }
+
+        .insight-card.positive {
+            background: #d1fae5;
+            border-left-color: #10b981;
+        }
+
+        .insight-card.negative {
+            background: #fee2e2;
+            border-left-color: #ef4444;
+        }
+
+        .insight-icon {
+            font-size: 1.3rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .insight-title {
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.6rem;
+            font-size: 1.05rem;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .insight-text {
+            color: #475569;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* Form Analysis */
+        .form-section {
+            grid-column: 1 / -1;
+            background: white;
+            border-radius: 8px;
+            padding: 2.5rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-metric {
+            background: #f8fafc;
+            padding: 1.8rem;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .metric-name {
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 0.95rem;
+        }
+
+        .metric-score {
+            background: #10b981;
+            color: white;
+            padding: 0.3rem 0.9rem;
+            border-radius: 4px;
+            font-weight: 900;
+            font-size: 0.85rem;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 0.3px;
+        }
+
+        .metric-score.medium {
+            background: #f59e0b;
+        }
+
+        .metric-score.low {
+            background: #ef4444;
+        }
+
+        .metric-description {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+
+        .tab-button {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .tab-button.active {
+            color: white;
+            background: #0d9488;
+            border-color: #0d9488;
+        }
+
+        .tab-button:hover {
+            border-color: #0d9488;
+            color: #0d9488;
+        }
+
+        .tab-button.active:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <a href="index.html" class="logo">COURTVISION</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="workspace.html">Workspace</a>
+                <a href="analysis.html">View Analysis</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="analysis-container">
+        <div class="page-header">
+            <div>
+                <h1>Analysis Results</h1>
+                <p class="video-info">■ practice_session_jan2.mp4 • Analyzed on Jan 2, 2026</p>
+            </div>
+            <button class="export-button">Export Report</button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Shots</div>
+                <div class="stat-value">47</div>
+                <div class="stat-change">+12 from last session</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Field Goal %</div>
+                <div class="stat-value">57.4%</div>
+                <div class="stat-change">+8.2% improvement</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">3-Point %</div>
+                <div class="stat-value">41.7%</div>
+                <div class="stat-change">+5.1% improvement</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Hot Zone</div>
+                <div class="stat-value">Right Wing</div>
+                <div class="stat-change">72.7% accuracy</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg Release Time</div>
+                <div class="stat-value">0.82s</div>
+                <div class="stat-change negative">-0.04s slower</div>
+            </div>
+        </div>
+
+        <div class="analysis-grid">
+            <div class="shot-chart-section">
+                <div class="section-header">
+                    Shot Chart
+                    <div class="tab-nav">
+                        <button class="tab-button active">All Shots</button>
+                        <button class="tab-button">Makes</button>
+                        <button class="tab-button">Misses</button>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="court">
+                        <!-- Makes -->
+                        <div class="shot-marker make" style="top: 25%; left: 35%;"></div>
+                        <div class="shot-marker make" style="top: 30%; left: 65%;"></div>
+                        <div class="shot-marker make" style="top: 45%; left: 20%;"></div>
+                        <div class="shot-marker make" style="top: 45%; left: 80%;"></div>
+                        <div class="shot-marker make" style="top: 60%; left: 30%;"></div>
+                        <div class="shot-marker make" style="top: 60%; left: 70%;"></div>
+                        <div class="shot-marker make" style="top: 70%; left: 50%;"></div>
+                        <div class="shot-marker make" style="top: 35%; left: 50%;"></div>
+                        <div class="shot-marker make" style="top: 50%; left: 40%;"></div>
+                        <div class="shot-marker make" style="top: 50%; left: 60%;"></div>
+                        <div class="shot-marker make" style="top: 40%; left: 75%;"></div>
+                        <div class="shot-marker make" style="top: 55%; left: 25%;"></div>
+                        
+                        <!-- Misses -->
+                        <div class="shot-marker miss" style="top: 28%; left: 45%;"></div>
+                        <div class="shot-marker miss" style="top: 42%; left: 55%;"></div>
+                        <div class="shot-marker miss" style="top: 48%; left: 50%;"></div>
+                        <div class="shot-marker miss" style="top: 65%; left: 45%;"></div>
+                        <div class="shot-marker miss" style="top: 38%; left: 30%;"></div>
+                        <div class="shot-marker miss" style="top: 52%; left: 70%;"></div>
+                        <div class="shot-marker miss" style="top: 75%; left: 35%;"></div>
+                        <div class="shot-marker miss" style="top: 33%; left: 60%;"></div>
+                    </div>
+                </div>
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-dot make"></div>
+                        <span>Made Shot (27)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot miss"></div>
+                        <span>Missed Shot (20)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="zone-analysis">
+                <div class="section-header">Zone Breakdown</div>
+                
+                <div class="zone-item">
+                    <div class="zone-header">
+                        <span class="zone-name">Right Wing</span>
+                        <span class="zone-percentage good">72.7%</span>
+                    </div>
+                    <div class="zone-bar">
+                        <div class="zone-bar-fill" style="width: 72.7%;"></div>
+                    </div>
+                    <div class="zone-attempts">8/11 makes</div>
+                </div>
+
+                <div class="zone-item">
+                    <div class="zone-header">
+                        <span class="zone-name">Top of Key</span>
+                        <span class="zone-percentage good">66.7%</span>
+                    </div>
+                    <div class="zone-bar">
+                        <div class="zone-bar-fill" style="width: 66.7%;"></div>
+                    </div>
+                    <div class="zone-attempts">6/9 makes</div>
+                </div>
+
+                <div class="zone-item">
+                    <div class="zone-header">
+                        <span class="zone-name">Left Wing</span>
+                        <span class="zone-percentage average">54.5%</span>
+                    </div>
+                    <div class="zone-bar">
+                        <div class="zone-bar-fill" style="width: 54.5%; background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);"></div>
+                    </div>
+                    <div class="zone-attempts">6/11 makes</div>
+                </div>
+
+                <div class="zone-item">
+                    <div class="zone-header">
+                        <span class="zone-name">Paint</span>
+                        <span class="zone-percentage average">50.0%</span>
+                    </div>
+                    <div class="zone-bar">
+                        <div class="zone-bar-fill" style="width: 50%; background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);"></div>
+                    </div>
+                    <div class="zone-attempts">4/8 makes</div>
+                </div>
+
+                <div class="zone-item">
+                    <div class="zone-header">
+                        <span class="zone-name">Corner 3</span>
+                        <span class="zone-percentage poor">37.5%</span>
+                    </div>
+                    <div class="zone-bar">
+                        <div class="zone-bar-fill" style="width: 37.5%; background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);"></div>
+                    </div>
+                    <div class="zone-attempts">3/8 makes</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="insights-section">
+            <div class="section-header">AI-Powered Insights</div>
+            <div class="insights-grid">
+                <div class="insight-card positive">
+                    <div class="insight-icon">▲</div>
+                    <div class="insight-title">Hot Streak Detected</div>
+                    <div class="insight-text">You made 6 consecutive shots from the right wing between minutes 4-7. This zone shows consistent form and high confidence.</div>
+                </div>
+
+                <div class="insight-card negative">
+                    <div class="insight-icon">▼</div>
+                    <div class="insight-title">Corner 3 Struggles</div>
+                    <div class="insight-text">Your corner 3-point percentage dropped 15% from last session. Consider practicing catch-and-shoot drills from this angle.</div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-icon">■</div>
+                    <div class="insight-title">Volume Analysis</div>
+                    <div class="insight-text">You attempted 47 total shots, up from 35 last session. Increased volume while maintaining 57% accuracy shows improved conditioning.</div>
+                </div>
+
+                <div class="insight-card positive">
+                    <div class="insight-icon">●</div>
+                    <div class="insight-title">Consistent Release</div>
+                    <div class="insight-text">Your release time variance decreased by 0.11s. More consistent mechanics correlate with your improved shooting percentage.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="section-header">Form Analysis</div>
+            <div class="form-grid">
+                <div class="form-metric">
+                    <div class="metric-header">
+                        <span class="metric-name">Elbow Alignment</span>
+                        <span class="metric-score">A</span>
+                    </div>
+                    <div class="metric-description">Excellent elbow positioning throughout shot motion. Maintained consistent 85-90° alignment on 89% of attempts.</div>
+                </div>
+
+                <div class="form-metric">
+                    <div class="metric-header">
+                        <span class="metric-name">Follow Through</span>
+                        <span class="metric-score">A-</span>
+                    </div>
+                    <div class="metric-description">Good extension and wrist snap. Slight improvement opportunity in holding follow-through position for 0.2s longer.</div>
+                </div>
+
+                <div class="form-metric">
+                    <div class="metric-header">
+                        <span class="metric-name">Shot Arc</span>
+                        <span class="metric-score medium">B+</span>
+                    </div>
+                    <div class="metric-description">Average arc of 45° is optimal. Some variation on longer-range shots (38-42°) suggests leg drive inconsistency.</div>
+                </div>
+
+                <div class="form-metric">
+                    <div class="metric-header">
+                        <span class="metric-name">Balance</span>
+                        <span class="metric-score">A</span>
+                    </div>
+                    <div class="metric-description">Excellent base and weight distribution. Landing within 6 inches of takeoff spot on 92% of shots.</div>
+                </div>
+
+                <div class="form-metric">
+                    <div class="metric-header">
+                        <span class="metric-name">Release Point</span>
+                        <span class="metric-score medium">B</span>
+                    </div>
+                    <div class="metric-description">Release height averaged 7.2ft. Consider raising release point by 2-3 inches for better defender clearance.</div>
+                </div>
+
+                <div class="form-metric">
+                    <div class="metric-header">
+                        <span class="metric-name">Jump Timing</span>
+                        <span class="metric-score low">C+</span>
+                    </div>
+                    <div class="metric-description">Timing between catch and jump varies 0.3-0.8s. Work on rhythm drills to develop more consistent timing.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Animate zone bars on load
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.zone-bar-fill').forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
